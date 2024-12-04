@@ -1,0 +1,8 @@
+bin/
+obj/
+out/
+
+*.old
+logfile.log
+
+.DS_Store
