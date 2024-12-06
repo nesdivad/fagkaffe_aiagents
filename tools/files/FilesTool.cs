@@ -56,49 +56,26 @@ public static class FileTool
     public async static Task<bool> ReplaceTextAsync(
         [Description("The path to the file")] string filepath,
         [Description("The old text to be replaced")] string oldText,
-        [Description("The new text to replace the old one")] string newText,
-        [Description("True if all occurrences should be replaced")] bool replaceAllOccurrences = false)
+        [Description("The new text to replace the old one")] string newText)
     {
-        string arguments = string.Empty;
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-        {
-            var searchTerm = $"s/{oldText.EscapeChars()}/{newText.EscapeChars()}/";
-            if (replaceAllOccurrences)
-                searchTerm += 'g';
-
-            arguments = $"-i {Constants.SedBackupExtension} -e \"{searchTerm}\" {filepath}";
-        }
-        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-        {
-            throw new NotImplementedException("Not yet implemented");
-        }
-        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            throw new NotImplementedException("Not yet implemented");
-        }
-
-        ProcessStartInfo startInfo = new()
-        {
-            FileName = "sed",
-            Arguments = arguments
-        };
-
-        try
-        {
-            var result = await Task.Run(() => ProcessHelper.RunProcess(startInfo));
-            return result.Output is null || !result.Output.Contains("invalid command code");
-        }
-        catch (Exception)
-        {
+        var file = await FileHelper.ReadFileAsync(filepath);
+        if (file is null)
             return false;
-        }
+
+        // back up file
+        await FileHelper.WriteFileAsync($"{filepath}{Constants.BackupExtension}", file);
+
+        var updatedFile = file.Replace(oldText, newText, StringComparison.Ordinal);
+        await FileHelper.WriteFileAsync(filepath, updatedFile);
+
+        return true;
     }
 
     [Description("Reverse changes to file, and returns the contents after reverse has been written to file")]
     public static async Task<string> ReverseFileChangesAsync(
         [Description("Name of file")] string filename)
     {
-        var backupFilename = $"{filename}{Constants.SedBackupExtension}";
+        var backupFilename = $"{filename}{Constants.BackupExtension}";
 
         var original = await SearchFileAsync(filename);
         var backup = await SearchFileAsync(backupFilename);

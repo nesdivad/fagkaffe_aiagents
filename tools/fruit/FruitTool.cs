@@ -4,8 +4,8 @@ namespace Fagkaffe.Tools.Fruit;
 
 public static class FruitTools
 {
-    [Description("Returnerer fargen på en frukt")]
-    public static string GetFruitColour([Description("Navn på frukt")] string fruit)
+    [Description("Returns the colour of a fruit")]
+    public static string GetFruitColour([Description("Name of fruit")] string fruit)
     {
         return fruit switch
         {

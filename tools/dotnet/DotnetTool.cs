@@ -8,14 +8,11 @@ namespace Fagkaffe.Tools.Dotnet;
 [Description("Tools for running dotnet commands")]
 public static class DotnetTool
 {
-    [Description("Run 'dotnet build' command on a specific .csproj file")]
+    [Description("Run dotnet commands")]
     public static async Task<string?> BuildAsync(
-        [Description("Path to project file. Needs to be of type .csproj")] string projectpath)
+        [Description("The dotnet command to run, e.g. 'build'")] string command,
+        [Description("Arguments for the command")] string arguments)
     {
-        if (!projectpath.EndsWith(".csproj"))
-            return "Wrong file type, please enter path to a .csproj-file";
-
-        var arguments = string.Empty;
         ProcessStartInfo startInfo;
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -28,7 +25,7 @@ public static class DotnetTool
         }
         else
         {
-            arguments = $"build {projectpath} --no-restore --tl:on";
+            arguments = $"{command} {arguments}";
             startInfo = new()
             {
                 FileName = "dotnet",

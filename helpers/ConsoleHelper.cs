@@ -11,6 +11,12 @@ public static class ConsoleHelper
         );
     }
 
+    public static void Clear()
+    {
+        Console.Clear();
+        WriteLine("Chathistorikk slettet!\n", ConsoleUser.SystemInformation);
+    }
+
     public static void WriteLine(string? text, ConsoleUser user)
     {
         SetForegroundColour(user);

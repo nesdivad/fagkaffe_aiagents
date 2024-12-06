@@ -67,7 +67,7 @@ var state = new ConsoleState(options);
 
 Action<object?, ConsoleCancelEventArgs> consoleCancelHandler = async (sender, eventArgs) =>
 {
-    var filename = $"out/chatlogs/chat_{DateTime.Now}.txt";
+    var filename = $"out/chatlogs/chat_{DateTime.Now:yyyy-MM-ddTHH:mm:ssZ}.txt";
     if (state.ChatMessages.Count > 1)
     {
         await FileHelper.WriteFileAsync(
@@ -190,10 +190,7 @@ void Print()
 void Clear()
 {
     state.ClearHistory();
-    ConsoleHelper.WriteLine(
-        "Chathistorikk slettet!\n",
-        ConsoleUser.SystemInformation
-    );
+    ConsoleHelper.Clear();
 }
 
 #endregion
