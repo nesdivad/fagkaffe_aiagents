@@ -23,10 +23,7 @@ public static class ServiceDependencies
         services.AddHttpClient<IGcpService, GcpService>();
 
         services.AddScoped<ITransportService, TransportService>();
-        services.AddHttpClient<ITransportService, TransportService>(client =>
-        {
-            client.DefaultRequestHeaders.UserAgent.ParseAdd("tool-calling github.com/nesdivad");
-        });
+        services.AddHttpClient<ITransportService, TransportService>();
     }
 
     public static void RegisterLogging(this IServiceCollection services, LogLevel logLevel = LogLevel.Error)
