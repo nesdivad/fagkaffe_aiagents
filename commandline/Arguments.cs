@@ -19,7 +19,7 @@ public static class ArgumentHelpers
         Option<LogLevel> option = new(
             name: "--loglevel",
             description: "Set logging level",
-            getDefaultValue: () => LogLevel.Information
+            getDefaultValue: () => LogLevel.Error
         );
         option.AddAlias("-l");
         option.AddCompletions(

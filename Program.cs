@@ -27,6 +27,7 @@ ConsoleStateOptions options = new(10);
 
 var hostBuilder = Host.CreateApplicationBuilder(args);
 hostBuilder.Configuration.AddUserSecrets<Program>();
+hostBuilder.Services.RegisterDependencies();
 
 var loglevelOption = ArgumentHelpers.GetLogLevelOption();
 var maxChatMessagesOption = ArgumentHelpers.GetMaxMessagesOption();
@@ -61,28 +62,25 @@ string azureOpenAIModel = hostBuilder.Configuration["AZURE_OPENAI_MODEL"]!;
 Uri ollamaEndpoint = new(hostBuilder.Configuration["OLLAMA_API_ENDPOINT"]!);
 string ollamaModel = "llama3.2";
 
-hostBuilder.Services.RegisterDependencies();
-
 var state = new ConsoleState(options);
 
 Action<object?, ConsoleCancelEventArgs> consoleCancelHandler = async (sender, eventArgs) =>
 {
-    var filename = $"out/chatlogs/chat_{DateTime.Now:yyyy-MM-ddTHH:mm:ssZ}.txt";
-    if (state.ChatMessages.Count > 1)
-    {
-        await FileHelper.WriteFileAsync(
-            filename,
-            state.PrettifyHistory()
-        );
+    await state.SaveChatlog();
 
-        ConsoleHelper.WriteLine(
-            $"\n\nHistorikk lagret -> {filename}",
-            ConsoleUser.System
-        );
-    }
+    ConsoleHelper.EraseLine();
+    ConsoleHelper.WriteLine("👋");
+    Console.CursorVisible = true; 
 };
 
-ConsoleHelper.Init(consoleCancelHandler);
+Dictionary<string, Action> commands = new()
+{
+    { "print()", Print },
+    { "clear()", Clear },
+    { "help()", Help }
+};
+
+ConsoleHelper.Init(consoleCancelHandler, commands);
 
 #endregion
 
@@ -98,10 +96,14 @@ OllamaChatClient ollamaChatClient = new(ollamaEndpoint, ollamaModel);
 
 #region [ Step 3: Register client and configuration ]
 
-hostBuilder.Services.AddChatClient(builder => builder
-        // Where the magic happens
-        .UseFunctionInvocation()
-        .Use(openAIClient.AsChatClient(azureOpenAIModel)));
+IChatClient chatClient = openAIClient
+    .AsChatClient(azureOpenAIModel)
+    .AsBuilder()
+    // where the magic happens
+    .UseFunctionInvocation()
+    .Build();
+
+hostBuilder.Services.AddChatClient(chatClient);
 
 #endregion
 
@@ -130,8 +132,13 @@ ChatOptions chatOptions = new()
 
 async Task Chat(string input)
 {
+    CancellationTokenSource cancellationTokenSource = new();
+    CancellationToken token = cancellationTokenSource.Token;
+    ConsoleHelper.SetCursorVisible(false);
+    ConsoleHelper.Wait(token);
+    
     // Get service from IServiceProvider
-    var client = app.Services.GetService<IChatClient>()!;
+    IChatClient client = app.Services.GetService<IChatClient>()!;
 
     // Append chat message
     state.AppendHistory(new ChatMessage(ChatRole.User, input));
@@ -139,8 +146,13 @@ async Task Chat(string input)
     // Send message to AI model, using chat messages and chat options configured with tools
     var result = await client.CompleteAsync(
         state.ChatMessages,
-        chatOptions
+        chatOptions,
+        token
     );
+
+    cancellationTokenSource.Cancel();
+    ConsoleHelper.EraseLine();
+    ConsoleHelper.SetCursorVisible(true);
 
     // State handling, writing to stdout etc.
     state.AddChatCompletion(result);
@@ -159,20 +171,11 @@ async Task Chat(string input)
 while (true)
 {
     string? input = ConsoleHelper.ReadLine();
-    switch (input)
-    {
-        case null or "":
-            break;
-        case "clear()":
-            Clear();
-            break;
-        case "print()":
-            Print();
-            break;
-        default:
-            await Chat(input);
-            break;
-    }
+    if (string.IsNullOrEmpty(input)) continue;
+    if (commands.TryGetValue(input, out Action? action)) 
+        action();
+    else
+        await Chat(input);
 }
 
 #endregion
@@ -181,16 +184,34 @@ while (true)
 
 void Print()
 {
-    ConsoleHelper.WriteLine(
-        state.PrettifyHistory(),
-        ConsoleUser.System
-    );
+    ConsoleHelper.WriteLine(state.PrettifyHistory());
 }
 
 void Clear()
 {
+    Task.Run(state.SaveChatlog);
     state.ClearHistory();
     ConsoleHelper.Clear();
 }
+
+void Help()
+{
+    ConsoleHelper.WriteLine("Examples:\n");
+    ConsoleHelper.WriteLine("Read <filename> and review the contents. Can you recommend some improvements?");
+    ConsoleHelper.WriteLine("I want to travel from Byparken to Solheimsviken. Can you find the next scheduled departure?");
+
+    ConsoleHelper.WriteLine("\nOptions:");
+    foreach (var option in rootCommand.Options)
+    {
+        var spacing = string.Concat(
+            Enumerable.Repeat(" ", 40 - option.Name.Length)
+        );
+        
+        ConsoleHelper.Write(
+            $"--{option.Name}{spacing}{option.Description}\n"
+        );
+    }
+}
+
 
 #endregion

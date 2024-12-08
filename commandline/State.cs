@@ -1,4 +1,5 @@
 using System.Text;
+using Fagkaffe.Helpers;
 using Microsoft.Extensions.AI;
 
 namespace Fagkaffe.CommandLine;
@@ -49,7 +50,7 @@ public class ConsoleState(ConsoleStateOptions options)
             {
                 foreach (var tool in chatCompletion.ToolCalls)
                 {
-                    sb.AppendLine($">> function name: {tool.FunctionName} | function args: {tool.FunctionArguments.ToString()}");
+                    sb.AppendLine($">> function name: \x1b[7m{tool.FunctionName}\x1b[27m | function args: \x1b[4m{tool.FunctionArguments.ToString()}\x1b[24m");
                 }
             }
             else if (message.RawRepresentation is OpenAI.Chat.ToolChatMessage toolChatMessage)
@@ -65,9 +66,18 @@ public class ConsoleState(ConsoleStateOptions options)
 
         sb.AppendLine(string.Concat(Enumerable.Repeat("=", 100)));
 
-        sb.Append(Statistics.Print());
+        sb.Append(Statistics.ToString());
 
         return sb.ToString();
+    }
+
+    public async Task<bool> SaveChatlog()
+    {
+        if (ChatMessages.Count <= 1) return false;
+        var filename = EverythingHelper.GetChatlogFilename();
+        await FileHelper.WriteFileAsync(filename, PrettifyHistory());
+
+        return true;
     }
 
     #endregion

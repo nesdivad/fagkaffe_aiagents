@@ -10,7 +10,7 @@ public static class ProcessHelper
         startInfo.RedirectStandardOutput = true;
 
         Process process = Process.Start(startInfo)!;
-        process.WaitForExit(10000);
+        process.WaitForExit(60000);
         var output = process.StandardOutput.ReadToEnd();
 
         return new(process.ExitCode, output);

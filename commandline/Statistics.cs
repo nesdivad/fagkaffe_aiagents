@@ -17,7 +17,7 @@ public class Statistics
         OutputTokens += tokens ?? 0;
     }
 
-    public string Print()
+    public override string ToString()
     {
         StringBuilder sb = new();
         sb.AppendLine(string.Concat(Enumerable.Repeat(" ", 100)));

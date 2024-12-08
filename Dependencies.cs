@@ -29,7 +29,7 @@ public static class ServiceDependencies
         });
     }
 
-    public static void RegisterLogging(this IServiceCollection services, LogLevel logLevel = LogLevel.Information)
+    public static void RegisterLogging(this IServiceCollection services, LogLevel logLevel = LogLevel.Error)
     {
         services.AddLogging(b => b.AddConsole().SetMinimumLevel(logLevel));
     }

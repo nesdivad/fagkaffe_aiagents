@@ -15,4 +15,7 @@ public static class EverythingHelper
 
     public static string EscapeChars(this string input)
         => input.Replace(".", @"\.");
+
+    public static string GetChatlogFilename()
+        => $"./out/chatlogs/chat_{DateTime.Now:yyyy-MM-ddTHH:mm:ssZ}.txt";
 }
