@@ -6,7 +6,7 @@ namespace Fagkaffe.CommandLine;
 
 public class ConsoleState(ConsoleStateOptions options)
 {
-    public ConsoleColor BackgroundColor { get; set; } = ConsoleColor.DarkBlue;
+    private readonly ChatMessage SystemMessage = new(ChatRole.System, "Du er en chatbot som svarer på alle spørsmål på norsk.");
     public IList<ChatMessage> ChatMessages { get; private set; } = [];
     public ConsoleStateOptions Options { get; } = options;
     public Statistics Statistics { get; } = new();
@@ -21,6 +21,10 @@ public class ConsoleState(ConsoleStateOptions options)
 
     public void AppendHistory(ChatMessage chatMessage)
     {
+        if (ChatMessages.Count is 0)
+        {
+            ChatMessages.Add(SystemMessage);
+        }
         if (ChatMessages.Count == Options.MaxChatMessages)
         {
             ChatMessages.RemoveAt(0);

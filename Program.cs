@@ -56,7 +56,9 @@ await new CommandLineBuilder(rootCommand)
 #region [ Initialization ]
 
 Uri azureOpenAIEndpoint = new(hostBuilder.Configuration["AZURE_OPENAI_API_ENDPOINT"]!);
+Uri azureOpenAIEndpointNorway = new(hostBuilder.Configuration["AZURE_OPENAI_API_ENDPOINT_NORWAY"]!);
 ApiKeyCredential azureOpenAIApiKey = new(hostBuilder.Configuration["AZURE_OPENAI_API_KEY"]!);
+ApiKeyCredential azureOpenAIApiKeyNorway = new(hostBuilder.Configuration["AZURE_OPENAI_API_KEY_NORWAY"]!);
 string azureOpenAIModel = hostBuilder.Configuration["AZURE_OPENAI_MODEL"]!;
 
 Uri ollamaEndpoint = new(hostBuilder.Configuration["OLLAMA_API_ENDPOINT"]!);
