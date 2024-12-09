@@ -109,7 +109,11 @@ hostBuilder.Services.AddChatClient(chatClient);
 
 #endregion
 
+#region [ Build app ]
+
 var app = hostBuilder.Build();
+
+#endregion
 
 #region [ Step 4: Register tools ]
 
@@ -134,10 +138,14 @@ ChatOptions chatOptions = new()
 
 async Task Chat(string input)
 {
+    #region stuff
+
     CancellationTokenSource cancellationTokenSource = new();
     CancellationToken token = cancellationTokenSource.Token;
     ConsoleHelper.SetCursorVisible(false);
     ConsoleHelper.Wait(token);
+
+    #endregion
     
     // Get service from IServiceProvider
     IChatClient client = app.Services.GetService<IChatClient>()!;
@@ -152,6 +160,8 @@ async Task Chat(string input)
         token
     );
 
+    #region morestuff
+
     cancellationTokenSource.Cancel();
     ConsoleHelper.EraseLine();
     ConsoleHelper.SetCursorVisible(true);
@@ -164,6 +174,8 @@ async Task Chat(string input)
         state.AppendHistory(message);
         ConsoleHelper.WriteLine(message.Text, ConsoleUser.Assistant);
     }
+
+    #endregion
 }
 
 #endregion
