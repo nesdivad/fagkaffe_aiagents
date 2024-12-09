@@ -54,7 +54,7 @@ public class ConsoleState(ConsoleStateOptions options)
             {
                 foreach (var tool in chatCompletion.ToolCalls)
                 {
-                    sb.AppendLine($">> function name: \x1b[7m{tool.FunctionName}\x1b[27m | function args: \x1b[4m{tool.FunctionArguments.ToString()}\x1b[24m");
+                    sb.AppendLine($">> function name: \x1b[7m{tool.FunctionName}\x1b[27m | function args: \x1b[1m{tool.FunctionArguments.ToString()}\x1b[22m");
                 }
             }
             else if (message.RawRepresentation is OpenAI.Chat.ToolChatMessage toolChatMessage)

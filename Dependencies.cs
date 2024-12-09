@@ -4,6 +4,7 @@ using Fagkaffe.Tools.Files;
 using Fagkaffe.Tools.Fruit;
 using Fagkaffe.Tools.Geocode;
 using Fagkaffe.Tools.Geolocation;
+using Fagkaffe.Tools.Git;
 using Fagkaffe.Tools.Transport;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DependencyInjection;
@@ -46,7 +47,8 @@ public static class ServiceDependencies
             FileTool.ReplaceTextAsync,
             FileTool.ReverseFileChangesAsync,
             FileTool.SearchTextInFiles,
-            DotnetTool.BuildAsync
+            DotnetTool.DotnetAsync,
+            GitTool.GitAsync
         ];
     }
 }

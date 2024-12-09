@@ -3,15 +3,15 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Fagkaffe.Helpers;
 
-namespace Fagkaffe.Tools.Dotnet;
+namespace Fagkaffe.Tools.Git;
 
-[Description("Tools for running dotnet commands")]
-public static class DotnetTool
+[Description("Tools for running git commands")]
+public static class GitTool
 {
-    [Description("Run dotnet commands")]
-    public static async Task<string?> DotnetAsync(
-        [Description("The dotnet command to run, e.g. 'build'")] string command,
-        [Description("Arguments for the command")] string arguments)
+    [Description("Run git commands")]
+    public static async Task<string?> GitAsync(
+        [Description("the command to execute")]string command, 
+        [Description("argumens for the command")]string arguments)
     {
         ProcessStartInfo startInfo;
 
@@ -28,7 +28,7 @@ public static class DotnetTool
             arguments = $"{command} {arguments}";
             startInfo = new()
             {
-                FileName = "dotnet",
+                FileName = "git",
                 Arguments = arguments
             };
         }
