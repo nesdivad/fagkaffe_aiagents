@@ -9,10 +9,10 @@ public static class FruitTools
     {
         return fruit switch
         {
-            "appelsin" => "grønn",
-            "eple" => "blå",
-            "banan" => "rosa",
-            _ => ""
+            "appelsin" => "oransje",
+            "eple" => "grønn",
+            "banan" => "gul",
+            _ => "ukjent"
         };
     }
 }
